@@ -1,7 +1,7 @@
-var async = require('async');
-var MongoClient = require('mongodb').MongoClient;
-var handler = require('./algorithms');
-var url = "mongodb://localhost:27017/"; //can be replaced by any valid MongoDB URL
+const async = require('async');
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://localhost:27017/"; //can be replaced by any valid MongoDB URL
+const rs = require('./services/RecommendationService');
 
 
 //↑------------------dependencies-------------------↑
@@ -31,17 +31,17 @@ exports.perform = function(username){
             var target = results.target;
             var secProfile = results.secProfile.map(elem => {
                 return elem.profile;
-            })
+            });
             var target_owned = target.ownedSec;
             var target_pref = target.typePref.concat(target.countryPref).concat(target.riskPref);
 
-            var recommendations = handler.topMatch(target_pref, secProfile, target_owned);
+            var recommendations = rs.contentBased(target_pref, secProfile, target_owned);
             console.log(recommendations);
             recommendations.forEach(function(elem){
                 console.log(results.secProfile[elem.key].name);
-            })
+            });
 
             db.close();
         });
     });
-}
+};
