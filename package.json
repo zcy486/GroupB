@@ -4,6 +4,7 @@
   "description": "We perform stock recommendation based on voting, neighborhood collaborative filtering and content-based cosine similarities",
   "dependencies": {
     "@tensorflow/tfjs": "^1.2.11",
+    "@tensorflow/tfjs-node": "^1.2.11",
     "async": "^3.1.0",
     "csv-parse": "^4.6.3",
     "mongodb": "^3.3.3"
