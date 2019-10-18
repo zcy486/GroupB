@@ -1,4 +1,4 @@
-var tf = require('@tensorflow/tfjs');
+const tf = require('@tensorflow/tfjs');
 
 
 //↑------------------dependencies-------------------↑
@@ -6,19 +6,19 @@ var tf = require('@tensorflow/tfjs');
 //if not, run "npm install <package_name>"
 
 
-//calculate the cosine similarities of two items
- function sim_cosine(item1, item2){
-    const ti1 = tf.tensor(item1);
-    const ti2 = tf.tensor(item2);
+//calculate the cosine similarities of two vectors
+ function sim_cosine(v1, v2){
+    const t1 = tf.tensor(v1);
+    const t2 = tf.tensor(v2);
 
-    const i1_norm = tf.sqrt(tf.sum(tf.square(ti1)));
-    const i2_norm = tf.sqrt(tf.sum(tf.square(ti2)));
+    const scalar_prod_t1_t2 = tf.sum(tf.mul(t1,t2));
 
-    const i1_i2 = tf.sum(tf.mul(ti1,ti2));
+    const t1_norm = tf.sqrt(tf.sum(tf.square(t1)));
+    const t2_norm = tf.sqrt(tf.sum(tf.square(t2)));
 
-    const cosin = tf.div(i1_i2, tf.mul(i1_norm,i2_norm)).arraySync();
+    const cosine = tf.div(scalar_prod_t1_t2, tf.mul(t1_norm,t2_norm)).arraySync();
 
-    return cosin;
+    return cosine;
 }
 
 exports.topMatch = function(ui, items, owned){
@@ -34,4 +34,4 @@ exports.topMatch = function(ui, items, owned){
 
     top = top.slice(0,5); //return the top five relevant securities
     return top;
-}
+};
