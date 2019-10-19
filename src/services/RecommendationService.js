@@ -1,25 +1,6 @@
 const ss = require('./SimilarityService');
 const fs = require('./FilteringService');
 
-// Calculates content-based recommendation
-// will be removed
-/*
-exports.contentBased = (ui, items, owned) => {
-    let top = [];
-    items.forEach((item,idx) => {
-        if(owned.indexOf(idx) === -1)
-            top.push({'key':idx,'sim':ss.cosine_similarity(ui,item)});
-    });
-
-    top.sort(function(a,b){
-        return b.sim-a.sim;
-    });
-
-    top = top.slice(0,5); //return the top five relevant securities
-    return top;
-};
-*/
-
 // Calculates voting-based recommendations
 // used for small samples
 exports.votingStrategy = (target, users) => {
@@ -74,17 +55,15 @@ exports.CFBased = function(target, users){
 
     //prediction part
     topUsers.forEach(user => {
+        
         var ownedSecurities = user.ownedSec;
-        var total = 0;
-        ownedSecurities.forEach(security => {
-            total += security.quantity;
-        });
-
+        var totalquantity = user.totalQuantity;
+     
         ownedSecurities.forEach(security => {
             var idx = top.findIndex(function(obj){
                 return obj.isin == security.isin;
             });
-            var weight = security.quantity/total;
+            var weight = security.quantity/totalquantity;
             if(idx == -1 && target_owned.findIndex(function(obj){
                 return obj.isin == security.isin
             }) == -1){
