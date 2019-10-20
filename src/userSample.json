@@ -1,0 +1,19 @@
+{
+    
+    "id": "",
+    "nick": "",
+    "agerange": "",
+    
+    "ownedSec":[
+        {
+            "isin":"",
+            "name":"",
+            "quantity": 20,
+            "type": "STK"
+        },
+        {"...":"..."},
+        {"...":"..."}
+    ],
+    "totalQuantity":100,
+    "uservector":["typePref + countryPref + riskPref"]
+}

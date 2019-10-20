@@ -1,7 +1,7 @@
+const rs = require('./services/RecommendationService');
 const async = require('async');
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/"; //can be replaced by any valid MongoDB URL
-const rs = require('./services/RecommendationService');
+const url = "unknown"; //can be replaced by any valid MongoDB URL
 
 
 //↑------------------dependencies-------------------↑
@@ -9,39 +9,46 @@ const rs = require('./services/RecommendationService');
 //if not, run "npm install <package_name>"
 
 
-exports.perform = function(username){
-//function perform(username){
+exports.perform = function(target_user_id){
     
     MongoClient.connect(url, {useNewUrlParser:true}, function(err,db){
         if(err) throw err;
         
-        var dbase = db.db('recommender');
-        var whereStr = {'username':username};
+        var dbase = db.db('intermediate_db');
+        var whereStr = {'id':target_user_id};
 
         async.parallel({
             target:function(callback){
                 dbase.collection('userProfile').findOne(whereStr, callback);
             },
-            secProfile:function(callback){
-                dbase.collection('secProfile').find({}).toArray(callback);
+            users:function(callback){
+                dbase.collection('userProfile').find({}).toArray(callback);
             },
 
         }, function(err, results){
             if(err) throw err;
             var target = results.target;
-            var secProfile = results.secProfile.map(elem => {
-                return elem.profile;
-            });
-            var target_owned = target.ownedSec;
-            var target_pref = target.typePref.concat(target.countryPref).concat(target.riskPref);
+            var users = results.users;
 
-            var recommendations = rs.contentBased(target_pref, secProfile, target_owned);
+            var target_owned = target.ownedSec;
+
+            var recommendations = [];
+            //small samples
+            if(target_owned.length < 50){
+                recommendations = rs.votingStrategy(target, users);
+            }
+            //big samples
+            else{
+                recommendations = rs.CFBased(target, users);
+            }
+            
             console.log(recommendations);
-            recommendations.forEach(function(elem){
-                console.log(results.secProfile[elem.key].name);
-            });
+            //recommendations.forEach(function(elem){
+            //    console.log(elem.isin);
+            //});
 
             db.close();
+            return recommendations;
         });
     });
 };

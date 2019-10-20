@@ -25,3 +25,6 @@ exports.pearson_similarity = (v1, v2) => {
 
     return this.cosine_similarity(mean_centered1.arraySync(), mean_centered2.arraySync())
 };
+
+//you may add more calculations of similarities here
+//TODO

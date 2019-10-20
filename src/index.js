@@ -1,12 +1,12 @@
-var extractor = require('./extractor');
+var extractor = require('./extract');
 var runner = require('./runner');
 
 function init(){
-    extractor.initialize();
+    extractor.extract();
 }
 
-function run(username){
-    runner.perform(username);
+function run(target_userid){
+    var recommendations = runner.perform(target_userid);
 }
 
 //if(initialization needed) init();
