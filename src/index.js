@@ -2,7 +2,7 @@ var extractor = require('./extract');
 var runner = require('./runner');
 
 function init(){
-    extractor.extract();
+    extractor.extractAll();
 }
 
 function run(target_userid){
