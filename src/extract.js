@@ -8,14 +8,14 @@ exports.extract = function(){
 
         //these names could be different
         var dbase = db.db('dbname');
-        var collection = dbase.collection('user_portfolios');
+        var collection = dbase.collection('user_with_portfolios');
 
         var dbase_constants = db.db('db_constants_name');
         var collection1 = dbase_constants.collection('secTypes');
         var collection2 = dbase_constants.collection('countries');
 
         async.paralell({
-            portfolios:function(callback){
+            userWithPortfolios:function(callback){
                 collection.find({}).toArray(callback);
             },
             secTypes:function(callback){
@@ -28,23 +28,23 @@ exports.extract = function(){
             if(err) throw err;
 
             var userProfile = [];
+            var userWithPortfolios = results.userWithPortfolios;
             var secTypes = results.secTypes;
             var countries = results.countries;
 
             //build userProfile for recommendations
-            results.portfolios.forEach(elem => {
+            userWithPortfolios.forEach(elem => {
                 var id = elem.user.id;
                 var nickname = elem.user.nick;
                 var agerange = elem.user.agerange;
                 var ownedSec = [];
-                var totalOwnedQuantity = 0;
 
                 //extract from portfolios
                 elem.portfolios.forEach(portfolio => {
                     var assets = portfolio.assets;
 
                     assets.forEach(security => {
-                        totalOwnedQuantity += security.quantity;
+                        
                         var idx = ownedSec.findIndex(function(obj){
                             return obj.isin = security.isin;
                         });
@@ -71,11 +71,10 @@ exports.extract = function(){
                     });
                     const risk_idx = secTypes[type_idx].risklevel;
 
-                    //we use weight to represent the user's preferences instead of 1
-                    var weight = security.quantity/totalOwnedQuantity;
-                    typePref[type_idx] += weight;
-                    countryPref[country_idx] += weight;
-                    if(risk_idx != -1) riskPref[risk_idx] += weight;
+                    //incremental approach
+                    typePref[type_idx] += 1;
+                    countryPref[country_idx] += 1;
+                    if(risk_idx != -1) riskPref[risk_idx] += 1;
                 });
 
                 var uservector = typePref.concat(countryPref).concat(riskPref);
@@ -85,7 +84,6 @@ exports.extract = function(){
                     'nick':nickname,
                     'agerange':agerange,
                     'ownedSec':ownedSec,
-                    'totalQuantity':totalOwnedQuantity,
                     'uservector':uservector
                 }
                 userProfile.push(user);
@@ -103,6 +101,7 @@ exports.extract = function(){
     });
 }
 
+// used if a new user is added/some users are updated
 exports.update = function(todo){
     //TODO
 }
