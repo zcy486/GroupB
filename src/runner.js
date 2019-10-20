@@ -34,12 +34,12 @@ exports.perform = function(target_user_id){
 
             var recommendations = [];
             //small samples
-            if(target_owned.length < 50){
-                recommendations = rs.votingStrategy(target, users);
+            if(target_owned.length < 30){
+                recommendations = rs.voting(target, users);
             }
             //big samples
             else{
-                recommendations = rs.CFBased(target, users);
+                recommendations = rs.cfBasedVoting(target, users);
             }
             
             console.log(recommendations);
