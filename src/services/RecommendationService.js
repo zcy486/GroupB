@@ -81,20 +81,22 @@ exports.CFBased = function(target, users){
     return top;
 };
 
-exports.CFBasedVoting = (target, users) => {
+exports.CFBasedVoting = (target, users, weighted) => {
     let recommendation = [];
-    let top_users = fs.filterKMostSimilarUsersSecurityBased(target, users, 20);
+    let top_similar_users = fs.filterKMostSimilarUsersSecurityBased(target, users, 20);
     let target_sec = target.ownedSec;
 
-    top_users.forEach(user => {
-        let user_sec = user.ownedSec;
+    top_similar_users.forEach(sim_user => {
+        let user_sec = sim_user.user.ownedSec;
+        let vote_weight = weighted ? sim_user.sim : 1;
         let target_not_owned = fs.targetDoesNotOwn(target_sec, user_sec);
+
         target_not_owned.forEach(isin => {
             let i = recommendation.findIndex(obj => isin === obj.isin);
             if (i === -1) {
-                recommendation.push({'isin' : isin, 'votes' : 1})
+                recommendation.push({'isin' : isin, 'votes' : vote_weight});
             } else {
-                ++recommendation[i].votes;
+                recommendation[i].votes += vote_weight;
             }
         });
     });

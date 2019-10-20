@@ -65,7 +65,6 @@ exports.filterKMostSimilarUsersSecurityBased = (target, users, k) => {
 
     similarity_score.sort((a, b) => b.sim - a.sim);
     similarity_score.slice(0, k);
-    similarity_score.map(e => e.user);
     return similarity_score;
 };
 
