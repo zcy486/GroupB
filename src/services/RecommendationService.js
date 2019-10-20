@@ -79,4 +79,27 @@ exports.CFBased = function(target, users){
 
     top = top.slice(0,5);
     return top;
-}
+};
+
+exports.CFBasedVoting = (target, users) => {
+    let recommendation = [];
+    let top_users = fs.filterKMostSimilarUsersSecurityBased(target, users, 20);
+    let target_sec = target.ownedSec;
+
+    top_users.forEach(user => {
+        let user_sec = user.ownedSec;
+        let target_not_owned = fs.targetDoesNotOwn(target_sec, user_sec);
+        target_not_owned.forEach(isin => {
+            let i = recommendation.findIndex(obj => isin === obj.isin);
+            if (i === -1) {
+                recommendation.push({'isin' : isin, 'votes' : 1})
+            } else {
+                ++recommendation[i].votes;
+            }
+        });
+    });
+
+    recommendation.sort((a, b) => b.votes - a.votes);
+    recommendation.slice(0, 5);
+    return recommendation;
+};

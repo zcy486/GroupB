@@ -26,7 +26,20 @@ exports.securityIntersection = (sec1, sec2) => {
         s2.push(sec.isin);
     });
 
-    return s1.filter(sec => b.has(sec));
+    return s1.filter(sec => s2.includes(sec));
+};
+
+exports.targetDoesNotOwn = (target_sec, user_sec) => {
+    let t_sec = [];
+    let u_sec = [];
+    target_sec.forEach(sec => {
+        t_sec.push(sec.isin);
+    });
+    user_sec.forEach(sec => {
+        u_sec.push(sec.isin);
+    });
+
+    return u_sec.filter(sec => !t_sec.includes(sec));
 };
 
 exports.filterKMostSimilarUsersSecurityBased = (target, users, k) => {
@@ -35,6 +48,7 @@ exports.filterKMostSimilarUsersSecurityBased = (target, users, k) => {
     users.forEach(user => {
         let user_sec = user.ownedSec;
         let intersection = this.securityIntersection(target_sec, user_sec);
+        if (intersection.length < 5) return;
         let target_amounts = [];
         let user_amounts = [];
         intersection.forEach(i_isin => {
